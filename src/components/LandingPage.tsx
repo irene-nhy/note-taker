@@ -1,25 +1,65 @@
-import Link from "next/link";
-import { FileText } from "lucide-react";
+'use client';
+
+import { useAuth } from '@/lib/supabase/AuthContext';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { FileText } from 'lucide-react';
 
 export default function LandingPage() {
+  const { user, signOut, isLoading } = useAuth();
+  const router = useRouter();
+
+  const handleStart = () => {
+    if (user) {
+      router.push('/app');
+    } else {
+      router.push('/signup');
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
       <nav className="h-16 px-12 flex items-center justify-between">
         <span className="text-xl font-semibold text-ink-primary">Note Taker</span>
         <div className="flex gap-4">
-          <Link
-            href="/login"
-            className="px-4 py-2 text-sm font-medium text-ink-primary border border-border rounded-md hover:bg-surface transition-colors"
-          >
-            Log In
-          </Link>
-          <Link
-            href="/signup"
-            className="px-4 py-2 text-sm font-medium text-white bg-ink-primary rounded-md hover:bg-ink-secondary transition-colors"
-          >
-            Sign Up
-          </Link>
+          {isLoading ? (
+            <div className="w-20 h-8 bg-surface animate-pulse rounded-md" />
+          ) : user ? (
+            <>
+              <Link
+                href="/app"
+                className="px-4 py-2 text-sm font-medium text-white bg-ink-primary rounded-md hover:bg-ink-secondary transition-colors"
+              >
+                Go to App
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 text-sm font-medium text-ink-primary border border-border rounded-md hover:bg-surface transition-colors"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-ink-primary border border-border rounded-md hover:bg-surface transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                className="px-4 py-2 text-sm font-medium text-white bg-ink-primary rounded-md hover:bg-ink-secondary transition-colors"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -30,12 +70,12 @@ export default function LandingPage() {
           Capture your thoughts, organize your ideas, and access them anywhere.
         </p>
         <div className="flex gap-4">
-          <Link
-            href="/signup"
+          <button
+            onClick={handleStart}
             className="px-6 py-3 text-sm font-medium text-white bg-ink-primary rounded-md hover:bg-ink-secondary transition-colors"
           >
-            Get Started
-          </Link>
+            {user ? 'Go to Your Notes' : 'Get Started'}
+          </button>
           <Link
             href="#features"
             className="px-6 py-3 text-sm font-medium text-ink-primary border border-border rounded-md hover:bg-surface transition-colors"
